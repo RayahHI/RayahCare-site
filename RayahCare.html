@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RayahCare CDSS</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f5ff;
+      overflow-x: hidden;
+    }
+    .page {
+      display: none;
+      padding: 40px 20px;
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 2;
+    }
+    .page.active {
+      display: block;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #6a5d99;
+    }
+    p, label {
+      color: #444;
+      line-height: 1.6em;
+    }
+    button {
+      display: block;
+      margin: 30px auto;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      background-color: #a7c7e7;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background-color: #8bb4d9;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .result {
+      background: #e3fce6;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+      color: #225f26;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      color: #aaa;
+      font-style: italic;
+    }
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      opacity: 0.25;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    .bubble1 { width: 120px; height: 120px; background: #ffd1dc; top: 10%; left: 5%; }
+    .bubble2 { width: 90px; height: 90px; background: #c3f0ca; top: 40%; left: 80%; }
+    .bubble3 { width: 140px; height: 140px; background: #fef2a0; top: 70%; left: 20%; }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-30px); }
+      100% { transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .page {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bubbles background -->
+  <div class="bubble bubble1"></div>
+  <div class="bubble bubble2"></div>
+  <div class="bubble bubble3"></div>
+
+  <!-- Welcome Page -->
+  <div id="welcome" class="page active">
+    <h1>Welcome to RayahCare</h1>
+    <p>
+      RayahCare is an AI-supported Clinical Decision Support System (CDSS) designed to assist healthcare professionals with patient assessments.
+    </p>
+    <p>
+      A CDSS is a digital tool that analyzes clinical data to help doctors and medical teams make informed decisions. It enhances the diagnostic process by providing real-time support, especially when reviewing medical notes, reports, and images.
+    </p>
+    <p>
+      RayahCare simplifies the workflow by:
+      <br>– Accepting patient data and medical documents
+      <br>– Supporting pediatric and adult ages (0 months to 120 years)
+      <br>– Suggesting possible diagnoses based on symptoms and notes
+      <br>– Generating AI-based treatment recommendations
+    </p>
+    <button type="button" onclick="goToForm()">Start Evaluation</button>
+  </div>
+
+  <!-- Patient Info Page -->
+  <div id="formPage" class="page">
+    <h2>Patient Information</h2>
+    <form id="patientForm">
+      <label>Patient Name *</label>
+      <input type="text" id="patientName" required />
+
+      <label>Healthcare Provider *</label>
+      <input type="text" id="providerName" required />
+
+      <label>Age *</label>
+      <div style="display:flex; gap:10px;">
+        <input type="number" id="ageYears" min="0" max="120" placeholder="Years" required />
+        <input type="number" id="ageMonths" min="0" max="11" placeholder="Months" required />
+      </div>
+
+      <label>Gender *</label>
+      <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label>Symptom Category *</label>
+      <select id="symptoms" required>
+        <option value="">Choose Category</option>
+        <option>Respiratory</option>
+        <option>Neurological</option>
+        <option>Cardiac</option>
+        <option>Digestive</option>
+        <option>Other</option>
+      </select>
+
+      <label>Medical Notes *</label>
+      <textarea id="notes" required></textarea>
+
+      <label>Upload Image (optional)</label>
+      <input type="file" id="image" accept="image/*" />
+
+      <button type="submit">Analyze</button>
+    </form>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <footer>Developed by Rayah Mishal ALmutairi 2025</footer>
+
+  <script>
+    function goToForm() {
+      document.getElementById('welcome').classList.remove('active');
+      document.getElementById('formPage').classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function validateAge(years, months) {
+      years = parseInt(years);
+      months = parseInt(months);
+      if (isNaN(years) || isNaN(months)) return false;
+      if (years < 0 || years > 120) return false;
+      if (months < 0 || months > 11) return false;
+      if (years === 0 && months === 0) return false;
+      if (years === 120 && months > 0) return false;
+      return true;
+    }
+
+    function generateDiagnosis(data) {
+      let diagnosis = "Symptoms need further investigation.";
+      let treatment = "Refer to specialist or continue observation.";
+
+      const text = data.notes.toLowerCase();
+      if (data.symptoms === "Respiratory" && text.includes("cough")) {
+        diagnosis = "Possible respiratory infection.";
+        treatment = "Recommend chest imaging and antibiotics.";
+      } else if (data.symptoms === "Neurological" && text.includes("headache")) {
+        diagnosis = "Possible migraine or tension headache.";
+        treatment = "Neurologist evaluation and pain management.";
+      }
+
+      return `
+Patient Name: ${data.patientName}
+Provider: ${data.providerName}
+Age: ${data.ageYears} year(s), ${data.ageMonths} month(s)
+Gender: ${data.gender}
+Symptoms: ${data.symptoms}
+
+--- Diagnosis Suggestion ---
+${diagnosis}
+
+--- Treatment Plan ---
+${treatment}
+
+*This is a simulated AI result. Always use clinical judgment.*
+      `.trim();
+    }
+
+    document.getElementById("patientForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        patientName: document.getElementById("patientName").value.trim(),
+        providerName: document.getElementById("providerName").value.trim(),
+        ageYears: document.getElementById("ageYears").value,
+        ageMonths: document.getElementById("ageMonths").value,
+        gender: document.getElementById("gender").value,
+        symptoms: document.getElementById("symptoms").value,
+        notes: document.getElementById("notes").value.trim(),
+      };
+
+      if (!validateAge(data.ageYears, data.ageMonths)) {
+        alert("Please enter a valid age between 0 months and 120 years.");
+        return;
+      }
+
+      const resultBox = document.getElementById("result");
+      resultBox.style.display = "block";
+      resultBox.textContent = "Analyzing patient data with AI... Please wait.";
+
+      setTimeout(() => {
+        const resultText = generateDiagnosis(data);
+        resultBox.textContent = resultText;
+        resultBox.scrollIntoView({ behavior: "smooth" });
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
